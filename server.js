@@ -9,6 +9,28 @@ app.use((req, res, next) => {
     next();
 });
 
+// Function to generate daily code
+function generateDailyCode() {
+    const today = new Date();
+    const dateString = today.toISOString().split('T')[0];
+    
+    let seed = 0;
+    for (let i = 0; i < dateString.length; i++) {
+        seed += dateString.charCodeAt(i);
+    }
+
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code = '';
+    
+    for (let i = 0; i < 6; i++) {
+        seed = (seed * 9301 + 49297) % 233280;
+        const index = Math.floor((seed / 233280) * characters.length);
+        code += characters[index];
+    }
+
+    return code;
+}
+
 // Verify public directory exists
 const publicPath = path.join(__dirname, 'public');
 if (!fs.existsSync(publicPath)) {
@@ -18,6 +40,12 @@ if (!fs.existsSync(publicPath)) {
 
 // Serve static files from the public directory
 app.use(express.static(publicPath));
+
+// Add endpoint that returns just the code
+app.get('/code', (req, res) => {
+    const code = generateDailyCode();
+    res.send(code);
+});
 
 // Serve index.html for the root route
 app.get('/', (req, res) => {
