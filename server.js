@@ -24,19 +24,19 @@ app.get('/', (req, res) => {
     try {
         const indexPath = path.join(publicPath, 'index.html');
         console.log('Attempting to serve:', indexPath);
-        
-        // Check if file exists
-        if (!fs.existsSync(indexPath)) {
-            console.error('index.html not found at:', indexPath);
-            return res.status(404).send('index.html not found');
-        }
+        res.sendFile(indexPath);
+    } catch (error) {
+        console.error('Server error:', error);
+        res.status(500).send('Server error');
+    }
+});
 
-        res.sendFile(indexPath, (err) => {
-            if (err) {
-                console.error('Error sending file:', err);
-                res.status(500).send('Error loading page');
-            }
-        });
+// Serve simple.html for /simple route
+app.get('/simple', (req, res) => {
+    try {
+        const simplePath = path.join(publicPath, 'simple.html');
+        console.log('Attempting to serve:', simplePath);
+        res.sendFile(simplePath);
     } catch (error) {
         console.error('Server error:', error);
         res.status(500).send('Server error');
